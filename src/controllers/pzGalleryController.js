@@ -5,9 +5,7 @@ const gallerySchema = Joi.object({
     altText: Joi.string().optional().allow('')
 });
 
-// @desc    Get all gallery images
-// @route   GET /api/playzone/gallery
-// @access  Public
+// Get all
 const getGallery = async (req, res) => {
     try {
         const images = await PzGallery.find().sort({ createdAt: -1 });
@@ -17,9 +15,7 @@ const getGallery = async (req, res) => {
     }
 };
 
-// @desc    Add a gallery image
-// @route   POST /api/playzone/gallery
-// @access  Private/Admin
+// Add image
 const addGalleryImage = async (req, res) => {
     try {
         const { error } = gallerySchema.validate(req.body);
@@ -27,13 +23,12 @@ const addGalleryImage = async (req, res) => {
             return res.status(400).json({ message: error.details[0].message });
         }
 
-        const image = req.file ? `/uploads/${req.file.filename}` : null;
-        if (!image) {
+        if (!req.file) {
             return res.status(400).json({ message: 'Image file is required' });
         }
 
         const galleryItem = await PzGallery.create({
-            image,
+            image: `/uploads/${req.file.filename}`,
             altText: req.body.altText || 'Play zone gallery image'
         });
 
@@ -43,65 +38,48 @@ const addGalleryImage = async (req, res) => {
     }
 };
 
+// ✅ SINGLE update function
 const updateGalleryImage = async (req, res) => {
     try {
         const { error } = gallerySchema.validate(req.body);
         if (error) {
             return res.status(400).json({ message: error.details[0].message });
         }
+
         const galleryItem = await PzGallery.findById(req.params.id);
         if (!galleryItem) {
             return res.status(404).json({ message: 'Gallery image not found' });
         }
+
+        // update fields
+        if (req.body.altText !== undefined) {
+            galleryItem.altText = req.body.altText;
+        }
+
         if (req.file) {
             galleryItem.image = `/uploads/${req.file.filename}`;
         }
-        galleryItem.altText = req.body.altText || galleryItem.altText;
+
         await galleryItem.save();
         res.status(200).json(galleryItem);
-    } catch (error) {        res.status(500).json({ message: 'Server Error updating gallery image' });
+
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error updating gallery image' });
     }
 };
 
-// @desc    Delete a gallery image
-// @route   DELETE /api/playzone/gallery/:id
-// @access  Private/Admin
+// Delete
 const deleteGalleryImage = async (req, res) => {
     try {
         const galleryItem = await PzGallery.findById(req.params.id);
         if (!galleryItem) {
             return res.status(404).json({ message: 'Gallery image not found' });
         }
+
         await galleryItem.deleteOne();
         res.status(200).json({ message: 'Gallery image removed' });
     } catch (error) {
         res.status(500).json({ message: 'Server Error deleting gallery image' });
-    }
-};
-
-// @desc    Update a gallery image
-// @route   PUT /api/playzone/gallery/:id
-// @access  Private/Admin
-const updateGalleryImage = async (req, res) => {
-    try {
-        const galleryItem = await PzGallery.findById(req.params.id);
-        if (!galleryItem) {
-            return res.status(404).json({ message: 'Gallery image not found' });
-        }
-
-        const { altText } = req.body;
-        if (altText !== undefined) {
-            galleryItem.altText = altText;
-        }
-
-        if (req.file) {
-            galleryItem.image = `/uploads/${req.file.filename}`;
-        }
-
-        await galleryItem.save();
-        res.status(200).json(galleryItem);
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error updating gallery image' });
     }
 };
 
