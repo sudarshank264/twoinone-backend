@@ -19,6 +19,24 @@ const getActivities = async (req, res) => {
     }
 };
 
+// @desc    Get single activity by ID
+// @route   GET /api/playzone/activities/:id
+// @access  Public
+const getActivityById = async (req, res) => {
+    try {
+        const activity = await PzActivity.findById(req.params.id);
+        if (!activity) {
+            return res.status(404).json({ message: 'Activity not found' });
+        }
+        res.status(200).json(activity);
+    } catch (error) {
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ message: 'Activity not found' });
+        }
+        res.status(500).json({ message: 'Server Error fetching activity' });
+    }
+};
+
 // @desc    Create a new activity
 // @route   POST /api/playzone/activities
 // @access  Private/Admin
@@ -45,6 +63,27 @@ const createActivity = async (req, res) => {
         res.status(500).json({ message: 'Server Error creating activity' });
     }
 };
+const updateActivity = async (req, res) => {
+    try {
+        const { error } = activitySchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
+        const activity = await PzActivity.findById(req.params.id);  
+        if (!activity) {
+            return res.status(404).json({ message: 'Activity not found' });
+        }
+        if (req.file) {
+            activity.image = `/uploads/${req.file.filename}`;
+        }
+        activity.title = req.body.title || activity.title;
+        activity.description = req.body.description || activity.description;
+        await activity.save();
+        res.json(activity);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error updating activity' });
+    }
+};
 
 // @desc    Delete an activity
 // @route   DELETE /api/playzone/activities/:id
@@ -64,6 +103,8 @@ const deleteActivity = async (req, res) => {
 
 module.exports = {
     getActivities,
+    getActivityById,
     createActivity,
+    updateActivity,
     deleteActivity
 };

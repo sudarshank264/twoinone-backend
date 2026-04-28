@@ -7,8 +7,13 @@ const {
     updateAbout
 } = require('../controllers/pzAboutController');
 
+const uploadFields = upload.fields([
+    { name: 'heroImage', maxCount: 1 },
+    { name: 'aboutImage', maxCount: 1 }
+]);
+
 router.route('/')
     .get(getAbout)
-    .put(protect, upload.single('image'), updateAbout);
+    .put(protect, uploadFields, updateAbout);
 
 module.exports = router;

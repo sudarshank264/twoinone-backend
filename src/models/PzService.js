@@ -3,19 +3,21 @@ const mongoose = require('mongoose');
 const pzServiceSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true,
+        required: [true, 'Please add a service title'],
         trim: true
     },
-    description: {
+    shortDescription: {
         type: String,
-        required: true
+        required: [true, 'Please add a short description for the card view']
     },
-    icon: {
+    mainContent: {
         type: String,
-        default: 'FaSmile' // default react-icon name
+        required: [true, 'Please add main content for the detail page']
+    },
+    image: {
+        type: String,
+        required: [true, 'Please upload an image']
     }
-}, {
-    timestamps: true
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('PzService', pzServiceSchema);

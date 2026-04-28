@@ -2,9 +2,16 @@ const PzAbout = require('../models/PzAbout');
 const Joi = require('joi');
 
 const aboutSchema = Joi.object({
-    text: Joi.string().required(),
-    title: Joi.string().optional()
-});
+    heroTitle: Joi.string().allow('', null),
+    heroSubtitle: Joi.string().allow('', null),
+    contactPhone: Joi.string().allow('', null),
+    contactEmail: Joi.string().allow('', null),
+    contactAddress: Joi.string().allow('', null),
+    aboutTitle: Joi.string().allow('', null),
+    aboutText: Joi.string().allow('', null),
+    text: Joi.string().allow('', null),
+    features: Joi.any()
+}).unknown(true);
 
 // @desc    Get about info
 // @route   GET /api/playzone/about
@@ -31,13 +38,23 @@ const updateAbout = async (req, res) => {
             return res.status(400).json({ message: error.details[0].message });
         }
 
-        const updateData = {
-            text: req.body.text,
-            title: req.body.title || 'About House of Play'
-        };
+        const updateData = { ...req.body };
+        
+        if (req.body.features) {
+            try {
+                updateData.features = typeof req.body.features === 'string' ? JSON.parse(req.body.features) : req.body.features;
+            } catch (e) {
+                console.error("Failed to parse features", e);
+            }
+        }
 
-        if (req.file) {
-            updateData.image = `/uploads/${req.file.filename}`;
+        if (req.files) {
+            if (req.files.heroImage && req.files.heroImage[0]) {
+                updateData.heroImage = `/uploads/${req.files.heroImage[0].filename}`;
+            }
+            if (req.files.aboutImage && req.files.aboutImage[0]) {
+                updateData.aboutImage = `/uploads/${req.files.aboutImage[0].filename}`;
+            }
         }
 
         let about = await PzAbout.findOne();
@@ -46,15 +63,12 @@ const updateAbout = async (req, res) => {
             // Update existing
             about = await PzAbout.findByIdAndUpdate(about._id, updateData, { new: true });
         } else {
-            // Check if image is present for first creation
-            if (!req.file) {
-                return res.status(400).json({ message: 'Image is required for initial creation' });
-            }
             about = await PzAbout.create(updateData);
         }
 
         res.status(200).json(about);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: 'Server Error updating about' });
     }
 };

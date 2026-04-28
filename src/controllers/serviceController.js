@@ -80,7 +80,7 @@ const updateService = async (req, res, next) => {
 
         if (req.file) {
             // Remove old image
-            const oldImagePath = path.join(__dirname, '../../public', service.image);
+            const oldImagePath = path.join(__dirname, '../../public/uploads', path.basename(service.image));
             if (fs.existsSync(oldImagePath)) {
                 fs.unlinkSync(oldImagePath);
             }
@@ -107,7 +107,7 @@ const deleteService = async (req, res, next) => {
             throw new Error('Service not found');
         }
 
-        const imagePath = path.join(__dirname, '../../public', service.image);
+        const imagePath = path.join(__dirname, '../../public/uploads', path.basename(service.image));
         if (fs.existsSync(imagePath)) {
             fs.unlinkSync(imagePath);
         }

@@ -2,9 +2,15 @@ const About = require('../models/About');
 const joi = require('joi');
 
 const aboutSchema = joi.object({
-    title: joi.string().required(),
-    description: joi.string().required()
-});
+    heroTitle: joi.string().allow('', null),
+    heroSubtitle: joi.string().allow('', null),
+    contactPhone: joi.string().allow('', null),
+    contactEmail: joi.string().allow('', null),
+    contactAddress: joi.string().allow('', null),
+    aboutTitle: joi.string().allow('', null),
+    aboutText: joi.string().allow('', null),
+    features: joi.any()
+}).unknown(true);
 
 const getAbout = async (req, res, next) => {
     try {
@@ -26,15 +32,33 @@ const addOrUpdateAbout = async (req, res, next) => {
             throw new Error(error.details[0].message);
         }
 
+        const updateData = { ...req.body };
+        
+        if (req.body.features) {
+            try {
+                updateData.features = typeof req.body.features === 'string' ? JSON.parse(req.body.features) : req.body.features;
+            } catch (e) {
+                console.error("Failed to parse features", e);
+            }
+        }
+
+        if (req.files) {
+            if (req.files.heroImage && req.files.heroImage[0]) {
+                updateData.heroImage = `/uploads/${req.files.heroImage[0].filename}`;
+            }
+            if (req.files.aboutImage && req.files.aboutImage[0]) {
+                updateData.aboutImage = `/uploads/${req.files.aboutImage[0].filename}`;
+            }
+        }
+
         let about = await About.findOne();
 
         if (about) {
-            about.title = req.body.title;
-            about.description = req.body.description;
+            Object.assign(about, updateData);
             const updatedAbout = await about.save();
             return res.json(updatedAbout);
         } else {
-            const newAbout = await About.create(req.body);
+            const newAbout = await About.create(updateData);
             return res.status(201).json(newAbout);
         }
     } catch (error) {

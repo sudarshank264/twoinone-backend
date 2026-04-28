@@ -1,13 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../middleware/uploadMiddleware');
+const { getGallery, addGalleryImage, deleteGalleryImage } = require('../controllers/galleryController');
 const { protect } = require('../middleware/authMiddleware');
-const {
-    getGallery,
-    addGalleryImage,
-    deleteGalleryImage,
-    updateGalleryImage
-} = require('../controllers/pzGalleryController');
+const upload = require('../middleware/uploadMiddleware');
+const { updateGalleryImage } = require('../controllers/galleryController');
 
 router.route('/')
     .get(getGallery)
