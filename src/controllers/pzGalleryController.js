@@ -79,6 +79,32 @@ const deleteGalleryImage = async (req, res) => {
     }
 };
 
+// @desc    Update a gallery image
+// @route   PUT /api/playzone/gallery/:id
+// @access  Private/Admin
+const updateGalleryImage = async (req, res) => {
+    try {
+        const galleryItem = await PzGallery.findById(req.params.id);
+        if (!galleryItem) {
+            return res.status(404).json({ message: 'Gallery image not found' });
+        }
+
+        const { altText } = req.body;
+        if (altText !== undefined) {
+            galleryItem.altText = altText;
+        }
+
+        if (req.file) {
+            galleryItem.image = `/uploads/${req.file.filename}`;
+        }
+
+        await galleryItem.save();
+        res.status(200).json(galleryItem);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error updating gallery image' });
+    }
+};
+
 module.exports = {
     getGallery,
     addGalleryImage,

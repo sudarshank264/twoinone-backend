@@ -101,6 +101,31 @@ const deleteActivity = async (req, res) => {
     }
 };
 
+// @desc    Update an activity
+// @route   PUT /api/playzone/activities/:id
+// @access  Private/Admin
+const updateActivity = async (req, res) => {
+    try {
+        const activity = await PzActivity.findById(req.params.id);
+        if (!activity) {
+            return res.status(404).json({ message: 'Activity not found' });
+        }
+
+        const { title, description } = req.body;
+        if (title) activity.title = title;
+        if (description) activity.description = description;
+
+        if (req.file) {
+            activity.image = `/uploads/${req.file.filename}`;
+        }
+
+        await activity.save();
+        res.status(200).json(activity);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error updating activity' });
+    }
+};
+
 module.exports = {
     getActivities,
     getActivityById,

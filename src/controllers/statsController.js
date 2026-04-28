@@ -1,3 +1,4 @@
+const Admin = require('../models/Admin');
 const Blog = require('../models/Blog');
 const Service = require('../models/Service');
 const PzActivity = require('../models/PzActivity');
@@ -5,7 +6,15 @@ const Lead = require('../models/Lead');
 
 const getDashboardStats = async (req, res, next) => {
     try {
-        const [activeBlogs, services, pzActivities, doctorLeads, playzoneLeads] = await Promise.all([
+        const [
+            usersCount,
+            blogsCount,
+            servicesCount,
+            pzActivitiesCount,
+            doctorLeads,
+            playzoneLeads
+        ] = await Promise.all([
+            Admin.countDocuments(),
             Blog.countDocuments(),
             Service.countDocuments(),
             PzActivity.countDocuments(),
@@ -14,13 +23,14 @@ const getDashboardStats = async (req, res, next) => {
         ]);
 
         res.json({
-            totalUsers: 1, // Assuming admin is the only user for now
-            activeBlogs,
-            services,
-            pzActivities,
+            totalUsers: usersCount,
+            activeBlogs: blogsCount,
+            services: servicesCount,
+            pzActivities: pzActivitiesCount,
             doctorLeads,
             playzoneLeads
         });
+
     } catch (error) {
         next(error);
     }

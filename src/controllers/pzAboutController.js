@@ -1,6 +1,7 @@
 const PzAbout = require('../models/PzAbout');
 const Joi = require('joi');
 
+// Validation schema
 const aboutSchema = Joi.object({
     heroTitle: Joi.string().allow('', null),
     heroSubtitle: Joi.string().allow('', null),
@@ -19,10 +20,7 @@ const aboutSchema = Joi.object({
 const getAbout = async (req, res) => {
     try {
         const about = await PzAbout.findOne();
-        if (!about) {
-            return res.status(200).json(null);
-        }
-        res.status(200).json(about);
+        return res.status(200).json(about || {});
     } catch (error) {
         res.status(500).json({ message: 'Server Error fetching about' });
     }
@@ -33,40 +31,44 @@ const getAbout = async (req, res) => {
 // @access  Private/Admin
 const updateAbout = async (req, res) => {
     try {
-        const { error } = aboutSchema.validate(req.body);
+        // Validate request body
+        const { error, value } = aboutSchema.validate(req.body);
         if (error) {
             return res.status(400).json({ message: error.details[0].message });
         }
 
-        const updateData = { ...req.body };
-        
-        if (req.body.features) {
+        let data = { ...value };
+
+        // Parse features if string
+        if (data.features && typeof data.features === 'string') {
             try {
-                updateData.features = typeof req.body.features === 'string' ? JSON.parse(req.body.features) : req.body.features;
+                data.features = JSON.parse(data.features);
             } catch (e) {
-                console.error("Failed to parse features", e);
+                console.error('Invalid features JSON');
             }
         }
 
+        // Handle file uploads
         if (req.files) {
-            if (req.files.heroImage && req.files.heroImage[0]) {
-                updateData.heroImage = `/uploads/${req.files.heroImage[0].filename}`;
+            if (req.files.heroImage) {
+                data.heroImage = `/uploads/${req.files.heroImage[0].filename}`;
             }
-            if (req.files.aboutImage && req.files.aboutImage[0]) {
-                updateData.aboutImage = `/uploads/${req.files.aboutImage[0].filename}`;
+            if (req.files.aboutImage) {
+                data.aboutImage = `/uploads/${req.files.aboutImage[0].filename}`;
             }
         }
 
         let about = await PzAbout.findOne();
 
         if (about) {
-            // Update existing
-            about = await PzAbout.findByIdAndUpdate(about._id, updateData, { new: true });
+            about.set(data);
+            await about.save();
         } else {
-            about = await PzAbout.create(updateData);
+            about = await PzAbout.create(data);
         }
 
         res.status(200).json(about);
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error updating about' });

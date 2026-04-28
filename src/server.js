@@ -21,12 +21,16 @@ const aboutRoutes = require('./routes/aboutRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
+<<<<<<< HEAD
 const leadRoutes = require('./routes/leadRoutes');
 const statsRoutes = require('./routes/statsRoutes');
+=======
+>>>>>>> 2a52a49 (doing backend fully)
 const pzActivityRoutes = require('./routes/pzActivityRoutes');
 const pzAboutRoutes = require('./routes/pzAboutRoutes');
 const pzServiceRoutes = require('./routes/pzServiceRoutes');
 const pzGalleryRoutes = require('./routes/pzGalleryRoutes');
+const statsRoutes = require('./routes/statsRoutes');
 
 // Load env
 dotenv.config();
@@ -57,14 +61,17 @@ app.use('/api/about', aboutRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/gallery', galleryRoutes);
+<<<<<<< HEAD
 app.use('/api/leads', leadRoutes);
+=======
+>>>>>>> 2a52a49 (doing backend fully)
 app.use('/api/stats', statsRoutes);
 
 // Play Zone
 app.use('/api/playzone/activities', pzActivityRoutes);
 app.use('/api/playzone/about', pzAboutRoutes);
 app.use('/api/playzone/services', pzServiceRoutes);
-app.use('/api/playzone/gallery', pzGalleryRoutes);
+app.use('/api/playzone/gallery', pzGalleryRoutes)
 
 app.get('/', (req, res) => {
     res.send('API is running...');
