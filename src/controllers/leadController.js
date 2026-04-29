@@ -3,9 +3,10 @@ const joi = require('joi');
 
 const leadSchema = joi.object({
     name: joi.string().required(),
-    email: joi.string().email().required(),
+    email: joi.string().email().allow('', null),
+    age: joi.string().allow('', null),
     phone: joi.string().required(),
-    service: joi.string().required(),
+    service: joi.string().allow('', null),
     message: joi.string().allow('', null),
     source: joi.string().valid('doctor', 'playzone').required()
 });
@@ -63,8 +64,24 @@ const updateLeadStatus = async (req, res, next) => {
     }
 };
 
+const deleteLead = async (req, res, next) => {
+    try {
+        const lead = await Lead.findById(req.params.id);
+        if (!lead) {
+            res.status(404);
+            throw new Error('Lead not found');
+        }
+
+        await lead.deleteOne();
+        res.json({ message: 'Lead removed' });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getLeads,
     createLead,
-    updateLeadStatus
+    updateLeadStatus,
+    deleteLead
 };

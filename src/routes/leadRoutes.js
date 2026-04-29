@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getLeads, createLead, updateLeadStatus } = require('../controllers/leadController');
+const { getLeads, createLead, updateLeadStatus, deleteLead } = require('../controllers/leadController');
 const { protect } = require('../middleware/authMiddleware');
 
 router.route('/')
@@ -9,5 +9,8 @@ router.route('/')
 
 router.route('/:id/status')
     .put(protect, updateLeadStatus);
+
+router.route('/:id')
+    .delete(protect, deleteLead);
 
 module.exports = router;

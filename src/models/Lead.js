@@ -8,7 +8,10 @@ const leadSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true,
+        trim: true
+    },
+    age: {
+        type: String,
         trim: true
     },
     phone: {
@@ -17,8 +20,7 @@ const leadSchema = new mongoose.Schema({
         trim: true
     },
     service: {
-        type: String,
-        required: true
+        type: String
     },
     message: {
         type: String

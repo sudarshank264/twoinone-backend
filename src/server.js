@@ -31,7 +31,6 @@ app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 const authRoutes = require('./routes/authRoutes');
 const aboutRoutes = require('./routes/aboutRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
-const blogRoutes = require('./routes/blogRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
 const leadRoutes = require('./routes/leadRoutes'); // ✅ keep
 const statsRoutes = require('./routes/statsRoutes');
@@ -45,7 +44,6 @@ const pzGalleryRoutes = require('./routes/pzGalleryRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/about', aboutRoutes);
 app.use('/api/services', serviceRoutes);
-app.use('/api/blogs', blogRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/leads', leadRoutes); // ✅ restored
 app.use('/api/stats', statsRoutes);
