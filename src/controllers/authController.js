@@ -43,13 +43,13 @@ const loginAdmin = async (req, res, next) => {
 // Seed initial admin if needed
 const seedAdmin = async (req, res, next) => {
     try {
-        const adminExists = await Admin.findOne({ email: 'admin2026@gmail.com' });
+        const adminExists = await Admin.findOne({ email: 'admin@twoinone.com' });
         if (adminExists) {
             return res.status(400).json({ message: 'Admin already exists' });
         }
         const admin = await Admin.create({
-            email: 'admin2026@gmail.com',
-            password: 'password'
+            email: 'admin@twoinone.com',
+            password: 'newpassword123'
         });
         res.status(201).json({ message: 'Admin seeded', email: admin.email });
     } catch (error) {
