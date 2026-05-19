@@ -40,8 +40,10 @@ const pzAboutRoutes = require('./routes/pzAboutRoutes');
 const pzServiceRoutes = require('./routes/pzServiceRoutes');
 const pzGalleryRoutes = require('./routes/pzGalleryRoutes');
 const videoShowcaseRoutes = require('./routes/videoShowcaseRoutes');
+const videoRoutes = require('./routes/videoRoutes');
 
 // API Routes
+app.use('/api/videos', videoRoutes);
 app.use('/api/video-showcase', videoShowcaseRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/about', aboutRoutes);
